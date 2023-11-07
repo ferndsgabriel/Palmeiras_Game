@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.a32cefb0.css",
+    "main.js": "/static/js/main.5581a9e0.js",
+    "static/media/background.jpg": "/static/media/background.409e72425cd67d572c50.jpg",
+    "static/media/backgound.webp": "/static/media/backgound.85a1f4ac29e8f2117ec9.webp",
+    "static/media/palmeiras.webp": "/static/media/palmeiras.fdcacffbaa219ab2af35.webp",
+    "index.html": "/index.html",
+    "main.a32cefb0.css.map": "/static/css/main.a32cefb0.css.map",
+    "main.5581a9e0.js.map": "/static/js/main.5581a9e0.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a32cefb0.css",
+    "static/js/main.5581a9e0.js"
+  ]
+}
