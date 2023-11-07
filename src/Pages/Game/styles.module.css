@@ -95,8 +95,10 @@
     animation:sucess 2s ease-in;
     background-repeat: no-repeat;
 } 
+
+
 .titleArea{
-    padding: 1.6rem 0.4rem;
+    padding: 1.6rem 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,6 +108,7 @@
 .title{
     color: var(--White);
     text-transform: uppercase;
+    font-size: 1.8rem;
 }
 .buttonsFather{
     display: flex;

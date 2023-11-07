@@ -7,7 +7,7 @@ const RoutesApp = () =>{
         <BrowserRouter>
             <Routes>
                 <Route path={'/'} element={<Home/>}/>
-                <Route path={'/game'} element={<Game/>}/>
+                <Route path={'/game/:states'} element={<Game/>}/>
             </Routes>
         </BrowserRouter>
     )

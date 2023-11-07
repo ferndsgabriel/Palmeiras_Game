@@ -1,11 +1,30 @@
 import styles from "./styles.module.css";
 import {AiFillCaretRight} from "react-icons/ai";
+import {useEffect, useState} from 'react';
 
 export default function Home(){
+    const [hasSave, setHasSave] = useState (false);
 
-    const handleGame=()=>{
-        window.location.href = '/game'
+    useEffect(()=>{
+        let punctuationStorage = localStorage.getItem("punctuation");
+        let abcUsedStorage = localStorage.getItem("abcUsed");
+        let chancesStorage = localStorage.getItem("chances");
+        let indexQuestionStorage = localStorage.getItem("indexQuestion"); 
+
+        try{    
+            if (abcUsedStorage && chancesStorage && indexQuestionStorage && punctuationStorage){
+                setHasSave(true);
+            }
+        }catch(err){
+            alert('oi')
+        }
+    },[]);
+
+    const handleGame=(url:string)=>{
+        window.location.href = `/game/${url}`
     }
+
+
     return(
         <>
             <div className={styles.container}>
@@ -15,13 +34,24 @@ export default function Home(){
                         <img src="./Palmeiras.webp" alt="logo palmeiras"
                         className={styles.img}/>
                     </div>
+
+                    {hasSave?(
+                        <button className={`buttonDefault ${styles['buttonPlay']}`}
+                        onClick={()=>handleGame('load')}>
+                            Continuar
+                        </button>
+                    ):(null)}
+
+
                     <button className={`buttonDefault ${styles['buttonPlay']}`}
-                    onClick={handleGame}>
+                    onClick={()=>handleGame('new')}>
                         <span className="buttonMoreIcons">
-                            Jogar
+                            Novo jogo
                             <AiFillCaretRight/>
                         </span>
                     </button>
+
+
                 </label>
 
             </div>

@@ -5,61 +5,59 @@ import {GiSoccerBall} from "react-icons/gi";
 import {toast } from 'react-toastify';
 import Modal from "react-modal";
 import StartNewGame from "../Modal/StartNewGame";
+import Pause from "../Modal/PauseGame";
+import { useParams } from "react-router-dom";
 
 export default function Game(){
+    const maxPunctuation = (palmeirasQuestions.length * 100);
     const [response, setResponse] = useState<string[]>([]); //useState da resposta
-    const [indexQuestion, setIndexQuestion] = useState(0); //random da question
+    const [indexQuestion, setIndexQuestion] = useState(0); //index da questão
     const abc = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']; //buttons
     const [abcUsed, setAbcUsed] = useState<string[]>([]); //letras que eu joguei
     const [chances, setChanges] = useState <number>(0); //minhas chances
-    const [punctuation, setPontuation] = useState<number>(0);
-    const [isOpenNewGame, setIsOpenNewGame] = useState (false);
+    const [punctuation, setPontuation] = useState<number>(0); //pontuação
+    const [isOpenNewGame, setIsOpenNewGame] = useState (false); //abrir modal de novo jogo ou menu pós vitória
+    const [isOpenPause, setIsOpenPause] = useState (false); //abrir modal de pause;
+
+    const url = useParams().states
+
+    useEffect(()=>{
+        if (url === 'load'){
+            getLocalStorage();
+        }else{
+            return;
+        }
+    },[Game]);
 
     function startNewGame(){
         setIsOpenNewGame(false);
+        setIsOpenPause(false);
         setResponse([]);
         setChanges(0);
         setAbcUsed([]);
         setIndexQuestion(0);
         setPontuation(0);
-        //reseta ao padrão
-    }
+    }  // função zera os processo do jogo
 
     function quitGame(){
         startNewGame();
         window.location.href = '/'
-    }
+    } // função vai para o tela de inicio
 
     useEffect(()=>{
-        const lenghTheReponse = palmeirasQuestions[indexQuestion].correct.length; //pegando o tamanho da resposta
-        const stringresponse =  palmeirasQuestions[indexQuestion].correct; // pega a resposta
-        const listString = [] // lista vazia
+        const lenghTheReponse = palmeirasQuestions[indexQuestion].correct.length; 
+        const stringresponse =  palmeirasQuestions[indexQuestion].correct; 
+        const listString = []
 
         for (var x = 0; x < lenghTheReponse; x ++){
             listString.push(stringresponse[x].toUpperCase());
         }
-         // adicionando cada letra da resposta na lista vazia
 
-        setResponse(listString,) // passando o valor da minha lista vazia  para a response
+        setResponse(listString,)
 
-    },[Game, response, indexQuestion]); // use state de obter respostas em formato lista
+    },[Game, response, indexQuestion]); //obter a resposta em lista  
     
-    useEffect(()=>{
-        const noRepeatUsed = new Set(abcUsed); //não repetir mesmas strings
-        const noRepeatReponse = new Set(response);
-        
-        if (noRepeatReponse.size === (noRepeatUsed.size - chances) && noRepeatUsed.size > 1){
-            toast.success('Avanti palestra!!') 
-            setResponse([]);
-            setChanges(0);
-            setAbcUsed([]);
-            setPontuation(punctuation + 100)
-            setIsOpenNewGame(true);
-            
-        }
-        //verificando se o numero de chances jogadas, menos o numero de chances perdidas é igual ao tamanho da frase
-    },[abcUsed]) // useState de vitória
-
+    
     function handleLetter(letter:string){
         if (abcUsed.some((item)=>{
             return item === letter
@@ -67,35 +65,77 @@ export default function Game(){
             toast.warning('Você já jogou esta letra');
             return
         }
-        //verificando se a letra que eu joguei já não foi usada
         else{
             setAbcUsed([...abcUsed, letter]);
         }
-         //se não foi mando ela pra uma lista de letras jogadas
-        
         if (!response.includes(letter)){
             setChanges(chances + 1);
+            setPontuation(punctuation - 10)
             if (chances >= 4){
                 toast.error('Perdemo :(')
-                setResponse([]);
-                setChanges(0);
-                setAbcUsed([]);
-                setPontuation(0);
+                startNewGame();
             }
         }
-         //verificando se a letra que eu joguei não existe na resposta, se não existe vai perdendo chances;
-    }
+    } // adicona as letras jogadas e verifica minhas chances
+    
+    useEffect(()=>{
+        const noRepeatUsed = new Set(abcUsed); 
+        const noRepeatReponse = new Set(response);
+        
+        if (noRepeatReponse.size === (noRepeatUsed.size - chances) && noRepeatUsed.size > 1){
+            toast.success('Avanti palestra!!') 
+            setResponse([]); setChanges(0); setAbcUsed([]); setPontuation(punctuation + 100);            
+            newIndexOrWin();
+        }
+        else{
+            return;
+        }
+    },[abcUsed]); // Verifica se eu ganhei a rodada
+    
 
-    function getIndexNoRepeat() {
+    function newIndexOrWin() {
             if ((palmeirasQuestions.length - 1) === indexQuestion){
                 setIsOpenNewGame(true);
             }else{
                 setIndexQuestion(indexQuestion + 1)
             }
+        } // Verifica se eu ganhei a rodada e posso ir pra proximo, ou ganhei o jogo // 
+
+    function controlPause(){
+        setIsOpenPause(!isOpenPause);
+    }
+
+    function saveLocalStorage(){
+        try{
+            localStorage.setItem('punctuation', JSON.stringify(punctuation));
+            localStorage.setItem('abcUsed', JSON.stringify(abcUsed));
+            localStorage.setItem('chances', JSON.stringify(chances));
+            localStorage.setItem('indexQuestion', JSON.stringify(indexQuestion));
+            toast.success('Jogo salvo!');
+            controlPause(); 
+        }catch(err){
+            console.log('Erro ao salvar estado');
         }
+    }
 
+    function getLocalStorage(){
+        let punctuationStorage = localStorage.getItem("punctuation");
+        let abcUsedStorage = localStorage.getItem("abcUsed");
+        let chancesStorage = localStorage.getItem("chances");
+        let indexQuestionStorage = localStorage.getItem("indexQuestion"); 
 
-
+        try{    
+            if (abcUsedStorage && chancesStorage && indexQuestionStorage && punctuationStorage){
+                setPontuation(JSON.parse(punctuationStorage));
+                setAbcUsed(JSON.parse(abcUsedStorage));
+                setChanges(JSON.parse(chancesStorage));
+                setIndexQuestion(JSON.parse(indexQuestionStorage));
+                setIsOpenPause(false);
+            }
+        }catch(err){
+            console.log('erro ao obter dados')
+        }
+    }
     return(
         <>  
             <main className={styles.container}>
@@ -104,7 +144,7 @@ export default function Game(){
                         <p className={styles.infosP}><strong>Pontuação:</strong> {punctuation}</p>
                         <p className={styles.infosP}><strong>Chances:</strong> {5-chances}</p>
                     </div>
-                    <button className={styles.pauseButton}><GiSoccerBall/></button>
+                    <button className={styles.pauseButton} onClick={controlPause}><GiSoccerBall/></button>
                 </section>
                 
                 <section className={styles.gameArea}>
@@ -154,11 +194,32 @@ export default function Game(){
 
             <Modal isOpen={isOpenNewGame}
             onRequestClose={quitGame}
-            className={'modal'}>
-                <StartNewGame NewGame={startNewGame} QuitGame={quitGame}/>
-
+            className={'modal'}
+            style={{overlay:{
+                backgroundColor:"rgba(255,255,255, 0.3)"
+            }}}>
+                <StartNewGame NewGame={startNewGame} 
+                QuitGame={quitGame}
+                Punctuation={punctuation}
+                MaxPunctuation={maxPunctuation}/>
             </Modal>
+            { /* modal pós vitoria*/ }
 
+            <Modal isOpen={isOpenPause}
+            onRequestClose={controlPause}
+            className={'modal'}
+            style={{overlay:{
+                backgroundColor:"rgba(255,255,255, 0.3)"
+            }}}>
+                <Pause Punctuation={punctuation}
+                CloseModal={controlPause}
+                NewGame={startNewGame}
+                QuitGame={quitGame}
+                SaveStates={saveLocalStorage}
+                LoadStates={getLocalStorage}/>
+            </Modal>
+            { /* modal pause*/ }
+            
 
         </>
     )
