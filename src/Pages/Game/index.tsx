@@ -154,7 +154,7 @@ export default function Game(){
                                 return(
                                     <span key={item} className={styles.responseBlock}
                                     id={abcUsed.includes(item)?(styles.specialStyle):('')}>
-                                        <p style={abcUsed.includes(item)?({color:'#006437', animation:'sucess 2s'}):({color:'transparent'})}>{item}</p>
+                                        <p style={abcUsed.includes(item)?({display:'block'}):({display:'none'})}>{item}</p>
                                     </span>
                                 )
                             })} 
