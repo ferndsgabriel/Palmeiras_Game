@@ -31,7 +31,7 @@ export default function Home(){
                 <h1>Roda-Roda Palmeiras</h1>
                 <label className={styles.itens}>
                     <div className={styles.imgArea}>
-                        <img src="./Palmeiras.webp" alt="logo palmeiras"
+                        <img src="./palmeiras.webp" alt="logo palmeiras"
                         className={styles.img}/>
                     </div>
 
